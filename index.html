@@ -1531,23 +1531,36 @@
     renderAll();
   }
 
-  // 🔐 ADMIN CHECK - Add your Telegram username here (e.g. @yourusername)
-  const ADMIN_USERNAMES = ['@oxforddropout']; // ← ЗАМЕНИ НА СВОЙ!
-  
-  // Check if current user is admin
-  if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && ADMIN_USERNAMES.includes('@' + tg.initDataUnsafe.user.username)) {
-    document.getElementById('pill-admin').style.display = 'block';
-  }
+ // 🔐 ADMIN CHECK - DEBUG VERSION
+console.log('TG object:', tg);
+console.log('User data:', tg?.initDataUnsafe?.user);
 
-  pillAdmin.addEventListener('click', () => {
-    if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user || !ADMIN_USERNAMES.includes('@' + tg.initDataUnsafe.user.username)) {
-      alert('Admin access required. Contact the owner.');
-      return;
-    }
-    hapticLightImpact();
-    switchToAdmin();
-  });
+const ADMIN_USERNAMES = ['@твой_юзернейм']; // ← ТВОЙ ТОЧНЫЙ НИК!
+
+if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+  const username = '@' + tg.initDataUnsafe.user.username;
+  console.log('Detected username:', username);
+  
+  if (ADMIN_USERNAMES.includes(username)) {
+    console.log('✅ Admin access granted');
+    document.getElementById('pill-admin').style.display = 'block';
+  } else {
+    console.log('❌ Not admin:', username);
+  }
+} else {
+  console.log('❌ No user data available');
+}
+
+pillAdmin.addEventListener('click', () => {
+  if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user || !ADMIN_USERNAMES.includes('@' + tg.initDataUnsafe.user.username)) {
+    alert('Admin access required. Contact the owner.');
+    return;
+  }
+  hapticLightImpact();
+  switchToAdmin();
+});
 
 </script>
 </body>
+
 </html>
