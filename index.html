@@ -603,7 +603,7 @@
     <h1>Video Quiz</h1>
     <div class="mode-toggle">
       <div class="pill active" id="pill-play">Play</div>
-      <div class="pill" id="pill-admin">Manage</div>
+      <div class="pill" id="pill-admin" style="display: none;">Manage</div>
     </div>
   </header>
 
@@ -1522,7 +1522,7 @@
     clearQuizState();
   });
 
-  // ==============================
+   // ==============================
   // Initial render
   // ==============================
   if (selectedVideoId) {
@@ -1530,6 +1530,23 @@
   } else {
     renderAll();
   }
+
+  // 🔐 ADMIN CHECK - Add your Telegram username here (e.g. @yourusername)
+  const ADMIN_USERNAMES = ['@oxforddropout']; // ← ЗАМЕНИ НА СВОЙ!
+  
+  // Check if current user is admin
+  if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && ADMIN_USERNAMES.includes('@' + tg.initDataUnsafe.user.username)) {
+    document.getElementById('pill-admin').style.display = 'block';
+  }
+
+  pillAdmin.addEventListener('click', () => {
+    if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user || !ADMIN_USERNAMES.includes('@' + tg.initDataUnsafe.user.username)) {
+      alert('Admin access required. Contact the owner.');
+      return;
+    }
+    hapticLightImpact();
+    switchToAdmin();
+  });
 
 </script>
 </body>
