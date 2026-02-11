@@ -743,13 +743,12 @@
     </div>
 </div>
 
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+<script>
 // ==============================
-// FIREBASE CONFIG - НАСТРОЕНО
+// FIREBASE CONFIG
 // ==============================
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
 const firebaseConfig = {
   apiKey: "AIzaSyD5pUVWBMr5Cp_YB33XY3ovaGwV7pVx73k",
   authDomain: "deepquiz-bc4e8.firebaseapp.com",
@@ -760,9 +759,8 @@ const firebaseConfig = {
   measurementId: "G-FYD9G5SYQF"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 const ADMIN_USERNAMES = ['@Oxforddropout'];
 
 // ==============================
@@ -791,8 +789,7 @@ function hapticLightImpact() {
 // ==============================
 async function loadFromBackend() {
     try {
-        const videosCol = collection(db, 'videos');
-        const snapshot = await getDocs(videosCol);
+        const snapshot = await db.collection('videos').get();
         const videos = [];
         snapshot.forEach(doc => {
             videos.push({ id: doc.id, ...doc.data() });
@@ -812,16 +809,14 @@ async function saveVideoToBackend(video) {
 
     try {
         if (video.id && video.id.startsWith('id_')) {
-            // New video - create with auto-generated ID
-            const docRef = await addDoc(collection(db, 'videos'), {
+            const docRef = await db.collection('videos').add({
                 title: video.title,
                 url: video.url,
                 questions: video.questions || []
             });
             video.id = docRef.id;
         } else if (video.id) {
-            // Update existing
-            await setDoc(doc(db, 'videos', video.id), {
+            await db.collection('videos').doc(video.id).set({
                 title: video.title,
                 url: video.url,
                 questions: video.questions || []
@@ -842,7 +837,7 @@ async function deleteVideoFromBackend(videoId) {
     }
 
     try {
-        await deleteDoc(doc(db, 'videos', videoId));
+        await db.collection('videos').doc(videoId).delete();
         return true;
     } catch (e) {
         console.error('Firebase delete failed:', e);
@@ -870,8 +865,7 @@ async function loadState() {
 }
 
 async function saveState() {
-    // Individual saves handled in saveVideoToBackend
-    await loadState(); // Refresh from Firebase
+    await loadState();
 }
 
 // ==============================
